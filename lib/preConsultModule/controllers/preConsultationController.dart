@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:medongosupport/preConsultModule/view/faceDetectionModules/camera.dart';
+import 'package:medongosupport/preConsultModule/view/faceDetectionModules/painter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:medongosupport/preConsultModule/consts/screenSize.dart';
@@ -238,6 +239,8 @@ class PCPreConsultationController extends GetxController {
       enableClassification: true,
     ),
   );
+
+  //vikas
 
   ///MAIN CAMERA CONTROLLER FOR IMAGE DETECTION - CAMERA CONTROLLERS
   //CameraController? cameraControllerInstance;

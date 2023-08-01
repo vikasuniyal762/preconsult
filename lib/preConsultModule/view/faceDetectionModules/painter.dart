@@ -5,8 +5,7 @@ import 'package:medongosupport/preConsultModule/widgets/coordinatesTranslator.da
 
 class FaceDetectorPainter extends CustomPainter {
   FaceDetectorPainter(this.faces, this.absoluteImageSize, this.rotation);
-
-  final List<Face> faces;
+  final  List<Face> faces;
   final Size absoluteImageSize;
   final InputImageRotation rotation;
 

@@ -12,6 +12,7 @@ import 'package:medongosupport/preConsultModule/consts/appColors.dart';
 import 'package:medongosupport/preConsultModule/consts/screenSize.dart';
 import 'package:medongosupport/preConsultModule/controllers/preConsultationController.dart';
 import 'package:medongosupport/preConsultModule/controllers/questionsController.dart';
+import 'package:medongosupport/preConsultModule/view/faceDetectionModules/painter.dart';
 import 'package:medongosupport/preConsultModule/widgets/alertDialogs.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:restart_app/restart_app.dart';
@@ -19,9 +20,12 @@ import 'package:restart_app/restart_app.dart';
 import '../../models/videoErrorModel.dart';
 import '../questionModules/questionsScreen.dart';
 
+
+
 class CameraSingleton {
   static CameraSingleton? instance;
   late CameraController cameraController;
+  late FaceDetectorPainter faceDetectorPainter;
 
   factory CameraSingleton() {
     instance ??= CameraSingleton.internal();
@@ -479,8 +483,55 @@ class _CameraViewState extends State<CameraView>
         preConsultationController.frameCounter.value++;
         break;
       case 1:
+FaceDetectorPainter faceDetectorPainter;
+// Assuming you have access to the original captured image named `image`
+        final double imageWidth = image.width.toDouble();
+        final double imageHeight = image.height.toDouble();
 
-        // cropAndSaveImage(imageFile.path,imageSize);
+        // Calculate the coordinates of the bounding box within the image
+        double left = preConsultationController.left.value;
+        double top = preConsultationController.top.value;
+        double right = preConsultationController.right.value;
+        double bottom = preConsultationController.bottom.value;
+
+        // Convert the bounding box coordinates to be relative to the image size
+        left = (left * imageWidth) / faceDetectorPainter.absoluteImageSize.width;
+        top = (top * imageHeight) / faceDetectorPainter.absoluteImageSize.height;
+        right = (right * imageWidth) / faceDetectorPainter.absoluteImageSize.width;
+        bottom = (bottom * imageHeight) / faceDetectorPainter.absoluteImageSize.height;
+
+        // Ensure the coordinates are within the image bounds
+        left = left.clamp(0, imageWidth);
+        top = top.clamp(0, imageHeight);
+        right = right.clamp(0, imageWidth);
+        bottom = bottom.clamp(0, imageHeight);
+
+        // Calculate the width and height of the bounding box
+        final double boundingBoxWidth = right - left;
+        final double boundingBoxHeight = bottom - top;
+
+        // Crop the part of the image inside the bounding box
+        final inputImageData = InputImageData(
+          size: Size(boundingBoxWidth, boundingBoxHeight),
+          imageRotation: InputImageRotation.rotation0, // Assuming the image is not rotated
+          inputImageFormat: InputImageFormatType.yuv420,
+          planeData: [], // You don't need planeData for cropping
+        );
+
+        final croppedBytes = image.planes[0].bytes.sublist(
+          (top * imageWidth).toInt(),
+          (bottom * imageWidth).toInt(),
+        );
+
+        final inputImage = InputImage.fromBytes(
+          bytes: Uint8List.fromList(croppedBytes),
+          inputImageData: inputImageData,
+        );
+
+        // Now, you can save the cropped `inputImage` or pass it to the next step in your processing.
+        // For example, you can call `widget.onImage!(inputImage);` to pass it to the `onImage` callback.
+
+        // The frameCounter is incremented to move on to the next step
         preConsultationController.frameCounter.value++;
         return;
       case 2:
